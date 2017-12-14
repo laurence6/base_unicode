@@ -2,15 +2,15 @@ package main
 
 import (
 	"bufio"
-	"fmt"
+	"bytes"
 	"io"
 	"log"
 	"os"
-	"unicode/utf8"
 )
 
 func main() {
-	var table []rune
+	table1 := []rune{}
+	table2 := map[rune]uint64{}
 	{
 		table_file, err := os.Open("data")
 		if err != nil {
@@ -19,47 +19,67 @@ func main() {
 		file_reader := bufio.NewReader(table_file)
 
 		var r rune
+		var i uint64 = 0
 		for r != '\n' {
 			r, _, err = file_reader.ReadRune()
 			if err != nil {
 				log.Fatalln(err)
 			}
-			table = append(table, r)
+			table1 = append(table1, r)
+			table2[r] = i
+			i++
 		}
 	}
 
-	Encode(table, bufio.NewReader(os.Stdin), os.Stdout)
+	//Encode(table1, bufio.NewReader(os.Stdin), os.Stdout)
+
+	buf := &bytes.Buffer{}
+	input_file, err := os.Open("input")
+	if err != nil {
+		log.Fatalln(err)
+	}
+	Encode(table1, bufio.NewReader(input_file), buf)
+	Decode(table2, buf, bufio.NewWriter(os.Stdout))
 }
 
-func Encode(table []rune, in io.ByteReader, out io.Writer) {
-	n_bits := max_bits_represented(len(table))
-	reader := NewBitsReader(in, n_bits)
+func Encode(table []rune, in io.Reader, out io.Writer) {
+	nc, nb := NCharsForNBytes(len(table))
+
+	bytes := make([]byte, nb)
+	for {
+		n, err := in.Read(bytes)
+		if uint(n) == nb {
+			for i := uint(0); i < nc; i++ {
+
+			}
+		} else {
+
+		}
+		if err != nil {
+			if err == io.EOF {
+				break
+			} else {
+				log.Fatalln(err)
+			}
+		}
+	}
+}
+
+func Decode(table map[rune]uint64, in io.RuneReader, out io.Writer) {
+	nc, nb := NCharsForNBytes(len(table))
 
 	for {
-		index, eof := reader.Read()
-		ch := table[index]
-		fmt.Fprintf(os.Stderr, "%d: %s\n", index, string(ch))
-		bytes := make([]byte, utf8.RuneLen(ch))
-		utf8.EncodeRune(bytes, ch)
-		out.Write(bytes)
-		if eof {
-			break
+		r, _, err := in.ReadRune()
+		if err != nil {
+			if err == io.EOF {
+				break
+			} else {
+				log.Fatalln(err)
+			}
 		}
-	}
-}
-
-func max_bits_represented(length int) (i uint) {
-	for ; length > 0; length >>= 1 {
-		i++
-	}
-	i -= 1
-	return
-}
-
-func min(a, b uint) uint {
-	if a < b {
-		return a
-	} else {
-		return b
+		b, ok := table[r]
+		if !ok {
+			log.Fatalf("unexpected rune: %s\n", string(r))
+		}
 	}
 }
