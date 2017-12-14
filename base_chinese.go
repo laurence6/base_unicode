@@ -18,16 +18,13 @@ func main() {
 		}
 		file_reader := bufio.NewReader(table_file)
 
-		table_bytes, err := file_reader.ReadBytes('\n')
-		if err != nil {
-			log.Fatalln(err)
-		}
-		table_bytes = table_bytes[:len(table_bytes)-1]
-
-		for len(table_bytes) > 0 {
-			r, size := utf8.DecodeRune(table_bytes)
+		var r rune
+		for r != '\n' {
+			r, _, err = file_reader.ReadRune()
+			if err != nil {
+				log.Fatalln(err)
+			}
 			table = append(table, r)
-			table_bytes = table_bytes[size:]
 		}
 	}
 
