@@ -10,7 +10,7 @@ import (
 )
 
 var DECODE = false
-var COLS = 80
+var COLS = 40
 var TABLE_PATH = "table"
 
 func init() {

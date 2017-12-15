@@ -50,6 +50,7 @@ func (self *Encoder) splitBytes(bytes []byte) []uint64 {
 func (self *Encoder) Encode(in io.Reader, out io.Writer) {
 	in_bytes := make([]byte, self.nbytes)
 	buf := &bytes.Buffer{}
+	nr := 0 // number of runes written in one line
 	for {
 		for i := 0; i < self.nbytes; i++ {
 			in_bytes[i] = 0
@@ -77,10 +78,16 @@ func (self *Encoder) Encode(in io.Reader, out io.Writer) {
 		}
 		for i := 0; i < _nc; i++ {
 			buf.WriteRune(self.table[indices[i]])
+			nr++
+			if nr >= COLS {
+				buf.WriteRune('\n')
+				nr = 0
+			}
 		}
 
 		if self.nbytes-n > 0 {
 			buf.WriteRune(rune(PADDING_OFFSET + self.nbytes - n))
+			nr++
 		}
 
 		out.Write(buf.Bytes())
