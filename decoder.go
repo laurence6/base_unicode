@@ -40,7 +40,13 @@ func (self *Decoder) assembleBytes(indices []uint64) []byte {
 		bitset.Add(&bitset, big.NewInt(int64(indices[i])))
 	}
 
-	return bitset.Bytes()
+	bytes := bitset.Bytes()
+	if n_leading_zeros := self.nbytes - len(bytes); n_leading_zeros > 0 {
+		leading_zeros := make([]byte, n_leading_zeros)
+		bytes = append(leading_zeros, bytes...)
+	}
+
+	return bytes
 }
 
 func (self *Decoder) Decode(in io.RuneReader, out io.Writer) {
@@ -67,8 +73,9 @@ func (self *Decoder) Decode(in io.RuneReader, out io.Writer) {
 		for i, r := range in_runes {
 			if index, ok := self.table[r]; ok {
 				in_indices[i] = index
-			} else if n_paddings == 0 {
+			} else {
 				n_paddings = int(r - PADDING_OFFSET)
+				break
 			}
 		}
 

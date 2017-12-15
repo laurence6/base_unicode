@@ -78,15 +78,17 @@ func (self *Encoder) Encode(in io.Reader, out io.Writer) {
 		}
 		for i := 0; i < _nc; i++ {
 			buf.WriteRune(self.table[indices[i]])
-			nr++
-			if nr >= COLS {
-				buf.WriteRune('\n')
-				nr = 0
+			if COLS > 0 {
+				nr++
+				if nr >= COLS {
+					buf.WriteRune('\n')
+					nr = 0
+				}
 			}
 		}
 
-		if self.nbytes-n > 0 {
-			buf.WriteRune(rune(PADDING_OFFSET + self.nbytes - n))
+		if n_paddings := self.nbytes - n; n_paddings > 0 {
+			buf.WriteRune(rune(PADDING_OFFSET + n_paddings))
 			nr++
 		}
 
