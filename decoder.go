@@ -4,6 +4,7 @@ import (
 	"io"
 	"log"
 	"math/big"
+	"unicode"
 )
 
 type Decoder struct {
@@ -56,8 +57,10 @@ func (self *Decoder) Decode(in io.RuneReader, out io.Writer) {
 		for n < self.nchars && err == nil {
 			r := rune(0)
 			r, _, err = in.ReadRune()
-			in_runes[n] = r
-			n++
+			if !unicode.IsSpace(r) {
+				in_runes[n] = r
+				n++
+			}
 		}
 
 		n_paddings := 0
