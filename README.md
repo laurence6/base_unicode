@@ -15,7 +15,7 @@ Please do not use characters between 0x20 ~ 0x60. (This may be fixed in the futu
 ## Usage
 
 ```
-Usage of ./main: ./main [OPTIONS]... [FILE]
+Usage: ./base_unicode [OPTIONS]... [FILE]
 If FILE is empty or '-', read from standard input.
   -d
   -decode

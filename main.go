@@ -24,7 +24,7 @@ func init() {
 	flag.StringVar(&TABLE_PATH, "table", TABLE_PATH, "path of table (if empty, use embedded table)")
 
 	flag.Usage = func() {
-		fmt.Fprintf(os.Stderr, "Usage of %s: %s [OPTIONS]... [FILE]\nIf FILE is empty or '-', read from standard input.\n", os.Args[0], os.Args[0])
+		fmt.Fprintf(os.Stderr, "Usage: %s [OPTIONS]... [FILE]\nIf FILE is empty or '-', read from standard input.\n", os.Args[0])
 		flag.PrintDefaults()
 	}
 }
