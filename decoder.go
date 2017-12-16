@@ -52,6 +52,8 @@ func (self *Decoder) assembleBytes(indices []uint64) []byte {
 func (self *Decoder) Decode(in io.RuneReader, out io.Writer) {
 	in_runes := make([]rune, self.nchars)
 	in_indices := make([]uint64, self.nchars)
+	var bytes []byte
+	n_paddings := 0
 	for {
 		for i := 0; i < self.nchars; i++ {
 			in_runes[i] = 0
@@ -63,31 +65,48 @@ func (self *Decoder) Decode(in io.RuneReader, out io.Writer) {
 		for n < self.nchars && err == nil {
 			r := rune(0)
 			r, _, err = in.ReadRune()
-			if !unicode.IsSpace(r) {
+			if unicode.IsPrint(r) && !unicode.IsSpace(r) {
 				in_runes[n] = r
 				n++
 			}
 		}
+		if err != nil && err != io.EOF {
+			log.Fatalln(err)
+		}
 
-		n_paddings := 0
 		for i, r := range in_runes {
 			if index, ok := self.table[r]; ok {
 				in_indices[i] = index
-			} else {
+			} else if r > PADDING_OFFSET {
 				n_paddings = int(r - PADDING_OFFSET)
 				break
 			}
 		}
 
-		bytes := self.assembleBytes(in_indices)
-		out.Write(bytes[:len(bytes)-n_paddings])
-
-		if err != nil {
-			if err == io.EOF {
+		if bytes == nil {
+			if n == 0 {
 				break
+			}
+		} else {
+			if n_paddings > 0 {
+				if n <= 1 {
+					out.Write(bytes[:len(bytes)-n_paddings])
+					break
+				} else {
+					out.Write(bytes)
+				}
 			} else {
-				log.Fatalln(err)
+				if n == self.nchars {
+					out.Write(bytes)
+				} else if n == 0 {
+					out.Write(bytes)
+					break
+				} else {
+					break
+				}
 			}
 		}
+
+		bytes = self.assembleBytes(in_indices)
 	}
 }
