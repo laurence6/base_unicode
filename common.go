@@ -1,5 +1,7 @@
 package main
 
+import "math/big"
+
 const PADDING_OFFSET = 0x20
 
 func leftmostBit(length int) (i int) {
@@ -10,9 +12,15 @@ func leftmostBit(length int) (i int) {
 	return
 }
 
-// FIXME: compute LCM
 func NCharsForNBits(length int) (nchars, nbits_c int) {
-	nchars = 8
 	nbits_c = leftmostBit(length)
+	nchars = 8
+
+	gcd_b := &big.Int{}
+	gcd_b.GCD(nil, nil, big.NewInt(int64(nchars)), big.NewInt(int64(nbits_c)))
+	gcd := int(gcd_b.Int64())
+
+	nchars /= gcd
+
 	return
 }
