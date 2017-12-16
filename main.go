@@ -11,7 +11,7 @@ import (
 
 var DECODE = false
 var COLS = 40
-var TABLE_PATH = "table"
+var TABLE_PATH = ""
 
 func init() {
 	flag.BoolVar(&DECODE, "d", DECODE, "decode data")
@@ -20,8 +20,8 @@ func init() {
 	flag.IntVar(&COLS, "w", COLS, "wrap lines after n characters (0 to disable wrap)")
 	flag.IntVar(&COLS, "wrap", COLS, "wrap lines after n characters (0 to disable wrap)")
 
-	flag.StringVar(&TABLE_PATH, "t", TABLE_PATH, "path of table")
-	flag.StringVar(&TABLE_PATH, "table", TABLE_PATH, "path of table")
+	flag.StringVar(&TABLE_PATH, "t", TABLE_PATH, "path of table (if empty, use embedded table)")
+	flag.StringVar(&TABLE_PATH, "table", TABLE_PATH, "path of table (if empty, use embedded table)")
 
 	flag.Usage = func() {
 		fmt.Fprintf(os.Stderr, "Usage of %s: %s [OPTIONS]... [FILE]\nIf FILE is empty or '-', read from standard input.\n", os.Args[0], os.Args[0])
@@ -33,7 +33,7 @@ func main() {
 	flag.Parse()
 
 	table := []rune{}
-	{
+	if TABLE_PATH != "" {
 		table_file, err := os.Open(TABLE_PATH)
 		if err != nil {
 			log.Fatalln(err)
@@ -52,6 +52,10 @@ func main() {
 			}
 			table = append(table, r)
 			i++
+		}
+	} else {
+		for _, r := range DEFAULT_TABLE {
+			table = append(table, r)
 		}
 	}
 
