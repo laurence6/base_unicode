@@ -1,7 +1,5 @@
 package main
 
-import "math/big"
-
 const PADDING_OFFSET = 0x20
 
 func leftmostBit(length int) (i int) {
@@ -12,15 +10,22 @@ func leftmostBit(length int) (i int) {
 	return
 }
 
+func gcd(a, b int) int {
+	if b > 0 {
+		for {
+			if a %= b; a == 0 {
+				break
+			}
+			if b %= a; b == 0 {
+				break
+			}
+		}
+	}
+	return a + b
+}
+
 func NCharsForNBits(length int) (nchars, nbits_c int) {
 	nbits_c = leftmostBit(length)
-	nchars = 8
-
-	gcd_b := &big.Int{}
-	gcd_b.GCD(nil, nil, big.NewInt(int64(nchars)), big.NewInt(int64(nbits_c)))
-	gcd := int(gcd_b.Int64())
-
-	nchars /= gcd
-
+	nchars = 8 / gcd(nbits_c, 8)
 	return
 }
