@@ -99,22 +99,13 @@ func (self *Decoder) Decode(in io.RuneReader, out io.Writer) {
 				break
 			}
 		} else {
-			if n_paddings > 0 {
-				if n == 0 {
-					out.Write(bytes[:len(bytes)-n_paddings])
-					break
-				} else {
-					out.Write(bytes)
-				}
+			if n == 0 {
+				out.Write(bytes[:len(bytes)-n_paddings])
+				break
+			} else if n == self.nchars || n_paddings > 0 {
+				out.Write(bytes)
 			} else {
-				if n == self.nchars {
-					out.Write(bytes)
-				} else if n == 0 {
-					out.Write(bytes)
-					break
-				} else {
-					break
-				}
+				break
 			}
 		}
 
