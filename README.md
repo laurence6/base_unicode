@@ -2,15 +2,17 @@
 
 base_unicode encodes arbitrary data into Unicode characters. Unicode character table can be specified by user.
 
-Note: This scheme is not efficient for storage space. The output is a little shorter than that of base64 (7% shorter using default Unicode character table).
+Note: Depends on the Unicode character table used, this scheme may be inefficient for storage. Using default table, the output is a little shorter than that of base64 (7% shorter).
 
 ## Unicode character table
 
 The user can specify a Unicode character table for encoding and decoding. A default table with Chinese characters is embedded, and its content can be found in file `default_table.txt`.
 
-Recommended table length is a power of two.
+You can also use the index table of base64, which can be found in `base64_table.txt`.
 
-Please do not use characters between 0x20 ~ 0x60. (This may be fixed in the future.)
+    ./base_unicode -t base64_table.txt [FILE]
+
+Recommended table length is a power of two.
 
 ## Usage
 
