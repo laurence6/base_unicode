@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"fmt"
 	"io"
 	"log"
 	"math/big"
@@ -88,8 +89,8 @@ func (self *Encoder) Encode(in io.Reader, out io.Writer) {
 		}
 
 		if n_paddings := self.nbytes - n; n_paddings > 0 {
-			buf.WriteRune(rune(PADDING_OFFSET + n_paddings))
-			nr++
+			buf.WriteRune(PADDING_CHAR)
+			buf.WriteString(fmt.Sprintf("%d\n", n_paddings))
 		}
 
 		out.Write(buf.Bytes())

@@ -1,6 +1,6 @@
 package main
 
-const PADDING_OFFSET = 0x20
+const PADDING_CHAR rune = 0xfffd
 
 func leftmostBit(length int) (i int) {
 	for ; length > 0; length >>= 1 {

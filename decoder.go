@@ -65,7 +65,21 @@ func (self *Decoder) Decode(in io.RuneReader, out io.Writer) {
 		for n < self.nchars && err == nil {
 			r := rune(0)
 			r, _, err = in.ReadRune()
-			if unicode.IsPrint(r) && !unicode.IsSpace(r) {
+			if r == PADDING_CHAR {
+				for {
+					r, _, err = in.ReadRune()
+					if err != nil && err != io.EOF {
+						log.Fatalln(err)
+					}
+					if '0' <= r && r <= '9' {
+						n_paddings *= 10
+						n_paddings += int(r - '0')
+					} else {
+						break
+					}
+				}
+				break
+			} else if unicode.IsPrint(r) && !unicode.IsSpace(r) {
 				in_runes[n] = r
 				n++
 			}
@@ -77,9 +91,6 @@ func (self *Decoder) Decode(in io.RuneReader, out io.Writer) {
 		for i, r := range in_runes {
 			if index, ok := self.table[r]; ok {
 				in_indices[i] = index
-			} else if r > PADDING_OFFSET {
-				n_paddings = int(r - PADDING_OFFSET)
-				break
 			}
 		}
 
@@ -89,7 +100,7 @@ func (self *Decoder) Decode(in io.RuneReader, out io.Writer) {
 			}
 		} else {
 			if n_paddings > 0 {
-				if n <= 1 {
+				if n == 0 {
 					out.Write(bytes[:len(bytes)-n_paddings])
 					break
 				} else {
